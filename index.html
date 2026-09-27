@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Radar — AI Career Intelligence</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <span class="radar-dot" aria-hidden="true"></span>
+    <span class="brand-name">Job Radar</span>
+  </div>
+
+  <form class="topbar-search" id="searchForm">
+    <input type="text" id="searchQuery" placeholder="Title, skill, or company — e.g. Python Developer" autocomplete="off">
+    <input type="text" id="searchLocation" placeholder="Location" autocomplete="off">
+    <button type="submit">Scan</button>
+  </form>
+
+  <nav class="topbar-actions">
+    <button id="themeToggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">◐</button>
+  </nav>
+</header>
+
+<div class="app-shell">
+
+  <!-- ============ SIDE NAV ============ -->
+  <aside class="sidenav">
+    <button class="nav-item active" data-view="dashboard">Dashboard</button>
+    <button class="nav-item" data-view="search">Search Jobs</button>
+    <button class="nav-item" data-view="recommended">Recommended</button>
+    <button class="nav-item" data-view="saved">Saved Jobs</button>
+    <button class="nav-item" data-view="profile">Resume &amp; Skill Match</button>
+    <button class="nav-item" data-view="learning">Learning Plan</button>
+    <button class="nav-item" data-view="market">Market Intelligence</button>
+
+    <div class="sidenav-footer">
+      <div class="sync-line">
+        <span class="sync-dot" id="syncDot"></span>
+        <span id="lastUpdatedLabel">Last updated —</span>
+      </div>
+      <div class="sync-sub">Sources: <span id="sourceCount">0</span> connected</div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <!-- DATA SOURCE NOTICE (always visible, honest by design) -->
+    <div class="source-banner" id="sourceBanner"></div>
+
+    <!-- ---------- DASHBOARD ---------- -->
+    <section class="view" id="view-dashboard">
+      <h1>Good to see you.</h1>
+      <p class="subhead">Here's the state of your job radar right now.</p>
+
+      <div class="stat-grid" id="statGrid"></div>
+
+      <div class="panel-row">
+        <div class="panel">
+          <h2>Recently scanned</h2>
+          <div class="job-list" id="recentJobs"></div>
+        </div>
+        <div class="panel panel-narrow">
+          <h2>Missing skills, ranked</h2>
+          <div id="topMissingSkills" class="chip-list"></div>
+          <button class="link-btn" data-view="learning">Build a learning plan →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- SEARCH ---------- -->
+    <section class="view hidden" id="view-search">
+      <h1>Search jobs</h1>
+      <p class="subhead" id="searchSummary">Enter a title, skill, or company above to scan connected sources.</p>
+
+      <div class="search-layout">
+        <div class="filters-panel">
+          <h3>Filters</h3>
+
+          <div class="filter-group">
+            <span class="filter-label">Posted</span>
+            <select id="filterPosted">
+              <option value="any">Any time</option>
+              <option value="1">Today</option>
+              <option value="3">Last 3 days</option>
+              <option value="7">Last 7 days</option>
+              <option value="30">Last 30 days</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Work mode</span>
+            <div class="check-row"><label><input type="checkbox" value="Remote" class="f-mode"> Remote</label></div>
+            <div class="check-row"><label><input type="checkbox" value="Hybrid" class="f-mode"> Hybrid</label></div>
+            <div class="check-row"><label><input type="checkbox" value="Onsite" class="f-mode"> Onsite</label></div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Job type</span>
+            <div class="check-row"><label><input type="checkbox" value="Full Time" class="f-type"> Full time</label></div>
+            <div class="check-row"><label><input type="checkbox" value="Internship" class="f-type"> Internship</label></div>
+            <div class="check-row"><label><input type="checkbox" value="Contract" class="f-type"> Contract</label></div>
+            <div class="check-row"><label><input type="checkbox" value="Part Time" class="f-type"> Part time</label></div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Experience</span>
+            <div class="check-row"><label><input type="checkbox" value="fresher" class="f-exp"> Fresher</label></div>
+            <div class="check-row"><label><input type="checkbox" value="experienced" class="f-exp"> Experienced</label></div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Sort by</span>
+            <select id="sortBy">
+              <option value="relevance">Relevance</option>
+              <option value="match">AI match score</option>
+              <option value="salary">Highest salary</option>
+              <option value="date">Latest posted</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="results-panel">
+          <div class="results-meta" id="resultsMeta"></div>
+          <div class="job-list" id="searchResults"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- RECOMMENDED ---------- -->
+    <section class="view hidden" id="view-recommended">
+      <h1>Recommended for you</h1>
+      <p class="subhead">Ranked against the skills in your profile. Build your profile under Resume &amp; Skill Match for better picks.</p>
+      <div class="job-list" id="recommendedJobs"></div>
+    </section>
+
+    <!-- ---------- SAVED ---------- -->
+    <section class="view hidden" id="view-saved">
+      <h1>Saved jobs</h1>
+      <div class="job-list" id="savedJobs"></div>
+    </section>
+
+    <!-- ---------- PROFILE / RESUME ---------- -->
+    <section class="view hidden" id="view-profile">
+      <h1>Resume &amp; skill match</h1>
+      <p class="subhead">Paste your resume text or a skills list below. Matching is computed from exactly what's here — nothing is guessed.</p>
+
+      <div class="profile-layout">
+        <div class="panel">
+          <h3>Your profile</h3>
+          <textarea id="resumeInput" rows="8" placeholder="Paste resume text, or list your skills separated by commas — e.g. Python, SQL, React, Git, Figma"></textarea>
+          <div class="row-actions">
+            <input type="file" id="resumeFile" accept=".txt" hidden>
+            <button class="btn-secondary" id="resumeFileBtn">Upload .txt file</button>
+            <button class="btn-primary" id="analyzeResumeBtn">Extract skills</button>
+          </div>
+          <p class="fineprint">PDF/DOCX parsing needs a server-side library (see code comments) — paste text or upload .txt for now.</p>
+        </div>
+
+        <div class="panel">
+          <h3>Extracted skill profile</h3>
+          <div id="extractedSkills" class="chip-list empty-state">No skills extracted yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- LEARNING PLAN ---------- -->
+    <section class="view hidden" id="view-learning">
+      <h1>Learning plan</h1>
+      <p class="subhead">Built from the actual gaps between your profile and the jobs you've viewed or saved.</p>
+      <div id="learningPlanContent"></div>
+    </section>
+
+    <!-- ---------- MARKET INTELLIGENCE ---------- -->
+    <section class="view hidden" id="view-market">
+      <h1>Market intelligence</h1>
+      <p class="subhead" id="marketSubhead"></p>
+      <div class="panel-row">
+        <div class="panel">
+          <h2>Most in-demand skills</h2>
+          <div id="marketSkills" class="bar-list"></div>
+        </div>
+        <div class="panel">
+          <h2>Hiring companies in this dataset</h2>
+          <div id="marketCompanies" class="bar-list"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ JOB DETAIL MODAL ============ -->
+<div class="modal-backdrop hidden" id="jobModalBackdrop">
+  <div class="modal" id="jobModal"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
